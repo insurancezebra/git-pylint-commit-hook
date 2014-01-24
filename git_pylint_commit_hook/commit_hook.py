@@ -103,7 +103,8 @@ def check_repo(
 
                 if '--rcfile' not in pylint_params:
                     command.append('--rcfile={}'.format(pylintrc))
-
+	    else:
+                command.append('--rcfile={}'.format(pylintrc))
             command.append(python_file)
 
             proc = subprocess.Popen(
