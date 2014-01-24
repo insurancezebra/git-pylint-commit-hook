@@ -128,6 +128,7 @@ def check_repo(
         else:
             status = 'FAILED'
             all_filed_passed = False
+            print(out)
 
         # Add some output
         print('{:.2}/10.00\t{}'.format(score, status))
