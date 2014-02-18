@@ -72,7 +72,6 @@ def check_repo(
             pylint_params += ' ' + conf.get('pre-commit-hook', 'params')
         if conf.has_option('pre-commit-hook', 'limit'):
             limit += ' ' + conf.get('pre-commit-hook', 'limit')
-        print "Parameters: %s" % pylint_params
     # Pylint Python files
     i = 1
     regexp = re.compile(r'^Your\ code\ has\ been\ rated\ at\ (\-?[0-9\.]+)/10')
@@ -92,6 +91,7 @@ def check_repo(
         score = 0.00
 
         # Start pylinting
+        sys.stdout.write("Parameter: %s" %pylint_params)
         sys.stdout.write("Running pylint on {} (file {}/{})..\t".format(
             python_file, i, len(python_files)))
         sys.stdout.flush()
