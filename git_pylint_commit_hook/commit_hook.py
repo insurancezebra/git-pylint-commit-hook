@@ -132,7 +132,7 @@ def check_repo(
             print(out)
 
         # Add some output
-        print('Something something to test{:.2}/10.00\t{}'.format(score, status))
+        print('{:.2}/10.00\t{}'.format(score, status) + 'Something something to test')
 
         # Bump parsed files
         i += 1
