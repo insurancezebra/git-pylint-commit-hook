@@ -23,7 +23,7 @@ def _get_list_of_committed_files():
 
 
 def check_repo(
-        limit, pylint='pylint', pylintrc='.pylintrc', pylint_params=None):
+        limit, pylint='pylint', pylintrc='.pylintrc', pylint_params=None, ignore=None):
     """ Main function doing the checks
 
     :type limit: float
@@ -72,18 +72,21 @@ def check_repo(
             pylint_params += ' ' + conf.get('pre-commit-hook', 'params')
         if conf.has_option('pre-commit-hook', 'limit'):
             limit += ' ' + conf.get('pre-commit-hook', 'limit')
+        if conf.get('MASTER', 'ignore'):
+            ignores = conf.get('MASTER', 'ignore')
+            ignores = ignores.split(',')
+
     # Pylint Python files
     i = 1
     regexp = re.compile(r'^Your\ code\ has\ been\ rated\ at\ (\-?[0-9\.]+)/10')
     for python_file, score in python_files:
         # Allow __init__.py files to be completely empty
-        if os.path.basename(python_file) == '__init__.py':
-            if os.stat(python_file).st_size == 0:
+        if os.path.basename(python_file) == '__init__.py'or reduce(lambda a, b: a or b in python_file, ignores, False):
+            if os.stat(python_file).st_size == 0 or reduce(lambda a, b: a or b in python_file, ignores, False):
                 print(
-                    'Skipping pylint on {} (empty __init__.py)..'
+                    'Skipping pylint on {}..'
                     '\tSKIPPED'.format(python_file))
 
-                # Bump parsed files
                 i += 1
                 continue
 
@@ -91,7 +94,6 @@ def check_repo(
         score = 0.00
 
         # Start pylinting
-        sys.stdout.write("Parameter: %s" %pylint_params)
         sys.stdout.write("Running pylint on {} (file {}/{})..\t".format(
             python_file, i, len(python_files)))
         sys.stdout.flush()
@@ -132,7 +134,7 @@ def check_repo(
             print(out)
 
         # Add some output
-        print('{:.2}/10.00\t{}'.format(score, status) + 'Something something to test')
+        print('{:.2}/10.00\t{}'.format(score, status))
 
         # Bump parsed files
         i += 1
