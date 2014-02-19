@@ -23,7 +23,7 @@ def _get_list_of_committed_files():
 
 
 def check_repo(
-        limit, pylint='pylint', pylintrc='.pylintrc', pylint_params=None, ignore=None):
+        limit, pylint='pylint', pylintrc='.pylintrc', pylint_params=None):
     """ Main function doing the checks
 
     :type limit: float
@@ -72,23 +72,27 @@ def check_repo(
             pylint_params += ' ' + conf.get('pre-commit-hook', 'params')
         if conf.has_option('pre-commit-hook', 'limit'):
             limit += ' ' + conf.get('pre-commit-hook', 'limit')
-        if conf.get('MASTER', 'ignore'):
-            ignores = conf.get('MASTER', 'ignore')
-            ignores = ignores.split(',')
+        ignores = conf.get('MASTER', 'ignore').split(',') if conf.get('MASTER', 'ignore') else []
 
     # Pylint Python files
     i = 1
     regexp = re.compile(r'^Your\ code\ has\ been\ rated\ at\ (\-?[0-9\.]+)/10')
     for python_file, score in python_files:
         # Allow __init__.py files to be completely empty
-        if os.path.basename(python_file) == '__init__.py'or reduce(lambda a, b: a or b in python_file, ignores, False):
-            if os.stat(python_file).st_size == 0 or reduce(lambda a, b: a or b in python_file, ignores, False):
+        if os.path.basename(python_file) == '__init__.py':
+            if os.stat(python_file).st_size == 0:
                 print(
                     'Skipping pylint on {}..'
                     '\tSKIPPED'.format(python_file))
 
                 i += 1
                 continue
+        if reduce(lambda a, b: a or b in python_file, ignores, False):
+            print(
+                    'Skipping pylint on {}..'
+                    '\tSKIPPED'.format(python_file))
+            i += 1
+            continue
 
         # Set the initial score
         score = 0.00
