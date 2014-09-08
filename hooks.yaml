@@ -1,0 +1,6 @@
+-   id: pylint
+        name: pylint
+        description: Runs pylint
+        entry: pylint
+        language: python
+        files: \.py$
